@@ -1,6 +1,6 @@
 <template>
   <div class="home">
-    <h1>对话AI</h1>
+    <header class="title">对话AI</header>
     <img alt="Vue logo" src="../assets/logo.png">
     <chat-robot></chat-robot>
   </div>
@@ -17,3 +17,18 @@ export default {
   }
 }
 </script>
+<style lang="less" scoped>
+.home{
+  height:100%;
+  width:100%;
+  position:relative;
+  z-index:10;
+}
+.title{
+  height:50px;
+  line-height:50px;
+  font-weight: bold;
+  font-size:22px;
+}
+</style>
+
