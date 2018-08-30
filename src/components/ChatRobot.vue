@@ -99,7 +99,7 @@ export default {
       let moveDiv = this.$el;
       this.nx = touch.clientX - this.position.x; //触摸点0  水平移动距离
       this.ny = touch.clientY - this.position.y; //触摸点0  垂直移动距离
-      console.log(this.nx,this.ny);
+      // console.log(this.nx,this.ny);
       this.xPum = this.dx + this.nx; //元素水平 原位置+移动距离
       this.yPum = this.dy + this.ny; //元素垂直  原位置+移动距离
       if (this.xPum < this.range.minX) {
