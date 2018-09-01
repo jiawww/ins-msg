@@ -1,7 +1,7 @@
 <template>
   <div class="home">
     <header class="title">对话AI</header>
-    <img alt="Vue logo" src="../assets/logo.png">
+    <my-map></my-map>
     <window></window>
     <chat-robot></chat-robot>
   </div>
@@ -11,12 +11,14 @@
 // @ is an alias to /src
 import ChatRobot from '@/components/ChatRobot.vue'
 import Window from '@/components/Window.vue'
+import MyMap from '@/components/MyMap.vue'
 
 export default {
   name: 'home',
   components: {
     ChatRobot,
-    Window
+    Window,
+    MyMap
   }
 }
 </script>
