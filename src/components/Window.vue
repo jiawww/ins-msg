@@ -1,14 +1,32 @@
 <!--  -->
 <template>
   <div class="window">
-    <div class="chat-history">
+    <div class="window-header">
+      <div class="title">
+        <img src="@public/image/robot.png" class="title-icon">
+        <img src="@public/image/text.png" class="title-text">
+      </div>
+      <div>
+        <img src="@public/image/icon_close.png" class="icon-right" @click="close">
+        <img src="@public/image/icon_small.png" class="icon-right">
+      </div>    
+    </div>
+    <div class="window-content">
       <p v-for="(item,index) in msgList" :key="index" v-show="item.msg!=='start'">
         <span>{{item.id}}：</span>
         <span>{{item.msg}}</span>
       </p>
+      <dialog-box></dialog-box>
+      <dialog-box :msg="{id:2,text:'查电费'}"></dialog-box>
     </div>
-    <div>
-      <textarea name="" id="" cols="30" rows="10" v-model="msg" @keydown="show($event)"></textarea>
+    <div class="window-textarea">
+      <div class="textarea-box">
+        <textarea v-model="msg" @keydown="show($event)" class="set-textarea" placeholder="请在此输入您要咨询的问题..."></textarea>
+      </div>
+      <div class="enter">
+        <span class="enter-text">快捷键&nbsp;&nbsp;Enter</span>
+        <button class="btn-send">发送</button>
+      </div>
     </div>
     <button @click="send(msg)">发送</button>
     <!-- <button @click="sendNum">发送编码</button> -->
@@ -19,6 +37,8 @@
 </template>
 
 <script>
+import httpConfig from "@/../public/httpConfig";
+import DialogBox from "@/components/DialogBox"
 export default {
   name: "window",
   data() {
@@ -35,13 +55,12 @@ export default {
     };
   },
 
-  components: {},
+  components: {DialogBox},
 
   computed: {},
 
   mounted() {
     this.send("start");
-    // this.initWebSocket();
   },
 
   methods: {
@@ -56,7 +75,7 @@ export default {
       if (val !== "start" && !/[^{][}$]/.test(val)) {
         this.msgList.push({ id: "2", msg: val });
       }
-      let url = "/api";
+      let url = httpConfig.url;
       let method = this.getConfig.method;
       let data = {};
       data[method] = val;
@@ -137,6 +156,9 @@ export default {
             addComp.streetNumber
         );
       });
+    },
+    close() {
+      this.$emit("close");
     }
     /*  nativePosition() {
        if (navigator.geolocation) {
@@ -164,11 +186,109 @@ export default {
 };
 </script>
 <style lang='less' scoped>
-.chat-history {
-  border: 1px solid blue;
-  width: 80%;
-  height: 200px;
+.window {
+  // width:1200px;
+  // height:760px;
+  width: 1200px;
+  height: 760px;
+  background: #fff;
+  border-radius: 10px;
+}
+.window-header {
+  height: 100px;
+  background: linear-gradient(to bottom, #34bdc4, #65e3ac);
+  border-radius: 10px 10px 0 0;
+  display: flex;
+  justify-content: space-between;
+  align-content: center;
+  .title {
+    line-height: 100px;
+    .title-icon {
+      height: 72px;
+      vertical-align: middle;
+      margin-left: 20px;
+    }
+    .title-text {
+      height: 40px;
+      vertical-align: middle;
+    }
+  }
+  .icon-right {
+    float: right;
+    margin-top: 18px;
+    width: 30px;
+    height: 30px;
+    &:nth-child(1) {
+      margin-right: 26px;
+    }
+    &:nth-child(2) {
+      margin-right: 30px;
+    }
+  }
+}
+.window-content {
+  height: 440px;
+  width: 100%;
+  padding:36px 30px 0;
+  box-sizing: border-box;
   overflow-y: auto;
-  margin: 0 auto;
+  border-bottom: 1px solid #e0e0e0;
+}
+.window-textarea {
+  height: 220px;
+  .textarea-box {
+    height: 130px;
+    width: 100%;
+    .set-textarea {
+      width: 100%;
+      height: 100%;
+      border: none;
+      outline: none;
+      resize: none;
+      box-sizing: border-box;
+      padding: 28px 30px 0;
+      font-size: 20px;
+      color: #000;
+      .placeholder-class {
+        font-size: 22px;
+        font-weight: normal;
+        color: #c4c4c4;
+      }
+      &::-webkit-input-placeholder{.placeholder-class}
+      &::-moz-input-placeholder{.placeholder-class}
+      &:-moz-input-placeholder{.placeholder-class}
+      &::-ms-input-placeholder{.placeholder-class}
+    }
+  }
+  .enter {
+    height: 90px;
+    line-height: 90px;
+    text-align: right;
+    padding-right: 30px;
+    .enter-text {
+      font-size: 20px;
+      color: #c4c4c4;
+      margin-right: 20px;
+    }
+  }
+}
+.btn-send {
+  width: 120px;
+  height: 56px;
+  line-height: 56px;
+  text-align: center;
+  border-radius: 10px;
+  border: none;
+  outline: none;
+  background: #44cabc;
+  color: #fff;
+  font-size: 22px;
+  cursor: pointer;
+  .disabled-class{
+    opacity: 0.6;
+  }
+  &:active{.disabled-class}
+  &:hover{.disabled-class}
+  &:disabled{.disabled-class}
 }
 </style>

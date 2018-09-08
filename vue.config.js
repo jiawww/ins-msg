@@ -13,7 +13,13 @@ module.exports = {
   // webpack配置
   // see https://github.com/vuejs/vue-cli/blob/dev/docs/webpack.md
   chainWebpack: () => { },
-  configureWebpack: () => { },
+  configureWebpack: {
+    resolve: {
+      alias: {
+        '@public': '../../public'
+      }
+    }
+  },
   // vue-loader 配置项
   // https://vue-loader.vuejs.org/en/options.html
   // vueLoader: {},
@@ -46,16 +52,7 @@ module.exports = {
     port: 8080,
     https: false,
     hotOnly: false,
-    proxy: {
-      '/api': {
-        target: 'http://47.105.41.30:5000/', // 接口的域名
-        // secure: false,  // 如果是https接口，需要配置这个参数
-        changeOrigin: true, // 如果接口跨域，需要进行这个参数配置
-        pathRewrite: {
-          '^/api': ''
-        }
-      }
-    }, // 设置代理
+    proxy: null, // 设置代理
     before: app => { }
   },
   // 第三方插件配置

@@ -1,17 +1,24 @@
 <!--  -->
 <template>
-  <div class="chat-robot" @mousedown="start" @touchstart="start" @mousemove="move" @touchmove="move"
+  <div class="robot-box" @mousedown="start" @touchstart="start" @mousemove="move" @touchmove="move"
        @mouseup="end" @touchend="end">
-    <div class="robot aikf-cartoon-red-showBtn" :style="{backgroundPosition:backgroundPosition}" @mouseover="over" @mouseout="clear"></div>
+    <div class="robot" v-show="isChat"  @click="switchWindow">
+      <img src="@public/image/chat_robot_1.gif" class="robot-stand">
+    </div>
+    <div v-show="!isChat">
+      <img src="@public/image/chat_robot_2.gif" class="robot-chat">
+      <window class="robot-window" @close="switchWindow"></window>  
+    </div>
   </div>
 </template>
 
 <script>
+import Window from "@/components/Window.vue";
 export default {
   name: "chat-robot",
   data() {
     return {
-      backgroundPosition: "0px",
+      isChat:false,
       timer: null,
       flag: false,
       position: {
@@ -35,7 +42,7 @@ export default {
     };
   },
 
-  components: {},
+  components: {Window},
 
   computed: {
     winWidth() {
@@ -50,7 +57,7 @@ export default {
 
   methods: {
     // 鼠标悬浮在机器人上
-    over() {
+   /*  over() {
       let cartoonIndex = 0;
       let _this = this;
       this.timer = setInterval(function() {
@@ -60,12 +67,12 @@ export default {
         }
         _this.backgroundPosition = -cartoonIndex * 100 + "px";
       }, 80);
-    },
+    }, */
     // 清除定时器
-    clear() {
+    /* clear() {
       clearInterval(this.timer);
       this.timer = null;
-    },
+    }, */
     //拖拽开始
     start() {
       this.flag = true;
@@ -120,15 +127,19 @@ export default {
     // 拖拽结束
     end() {
       this.flag = false;
+    },
+    //打开聊天窗口
+    switchWindow(){
+      this.isChat=!this.isChat;
     }
   }
 };
 </script>
 <style lang='less' scoped>
-.chat-robot {
+.robot-box {
   position: fixed;
-  left: 50%;
-  top: 50%;
+  left: 200px;
+  top: 300px;
   color: #fff;
   font-size: 16px;
   text-align: center;
@@ -137,13 +148,18 @@ export default {
   width: 100px;
   height: 270px;
   transform: translate(-50%,-50%);
-  .robot {
-    text-align: center;
+  .robot-stand{
+    width:400px;
+    height:379px;
   }
-  .aikf-cartoon-red-showBtn {
-    width: 100px;
-    height: 270px;
-    background: url(../../public/image/cartoon-red.png) left top no-repeat;
+  .robot-chat{
+    width:400px;
+    height:423px;
+  }
+  .robot-window{
+    position: absolute;
+    top:-30%;
+    left:256px;
   }
 }
 </style>
