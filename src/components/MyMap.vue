@@ -2,13 +2,23 @@
 <template>
   <div>
     <div class="map-box" ref="myMap"></div>
-    <!-- <button @click="initMap">初始化地图</button> -->
   </div>
 </template>
 
 <script>
 export default {
-  name:"my-map",
+  name: "my-map",
+  props: {
+    point: {
+      type: Object,
+      default() {
+        return {
+          longitude: 116.40387397,
+          latitude: 39.91488908
+        };
+      }
+    }
+  },
   data() {
     return {};
   },
@@ -18,18 +28,18 @@ export default {
   computed: {},
 
   mounted() {
-   this.initMap();
+    this.initMap();
   },
 
   methods: {
     initMap() {
       let el = this.$refs.myMap;
-      let _this=this;
+      let _this = this;
       var map = new BMap.Map(el); //初始化地图
       map.addControl(new BMap.NavigationControl()); //初始化地图控件
       map.addControl(new BMap.ScaleControl());
       map.addControl(new BMap.OverviewMapControl());
-      var point = new BMap.Point(116.404, 39.915);
+      var point = new BMap.Point(this.point.longitude, this.point.latitude);
       map.centerAndZoom(point, 15); //初始化地图中心点
       var marker = new BMap.Marker(point); //初始化地图标记
       marker.enableDragging(); //标记开启拖拽
@@ -82,8 +92,8 @@ export default {
 </script>
 <style lang='less' scoped>
 .map-box {
-  width: 500px;
-  height: 500px;
-  margin:0 auto;
+  width: 600px;
+  height: 300px;
+  margin: 10px auto 0;
 }
 </style>

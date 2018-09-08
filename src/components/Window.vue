@@ -8,37 +8,35 @@
       </div>
       <div>
         <img src="@public/image/icon_close.png" class="icon-right" @click="close">
-        <img src="@public/image/icon_small.png" class="icon-right">
+        <img src="@public/image/icon_small.png" class="icon-right" @click="minimize">
       </div>    
     </div>
-    <div class="window-content">
-      <p v-for="(item,index) in msgList" :key="index" v-show="item.msg!=='start'">
-        <span>{{item.id}}：</span>
-        <span>{{item.msg}}</span>
-      </p>
-      <dialog-box></dialog-box>
-      <dialog-box :msg="{id:2,text:'查电费'}"></dialog-box>
+    <div class="window-content" @wheel="scrollBarWheel($event)" ref="chatContent">
+      <p class="tip">可爱的小电，为您服务</p>
+      <dialog-box v-for="(msg,index) in msgList" :key="index" :msg="msg"></dialog-box>
+      <!-- <my-map></my-map> -->
     </div>
     <div class="window-textarea">
       <div class="textarea-box">
-        <textarea v-model="msg" @keydown="show($event)" class="set-textarea" placeholder="请在此输入您要咨询的问题..."></textarea>
+        <textarea v-model="msg" @keydown="show($event)" class="set-textarea" placeholder="请在此输入您要咨询的问题..." @wheel="scrollBarWheel($event)"></textarea>
       </div>
       <div class="enter">
         <span class="enter-text">快捷键&nbsp;&nbsp;Enter</span>
-        <button class="btn-send">发送</button>
+        <button class="btn-send" @click="send(msg)" :disabled="!canSend">发送</button>
       </div>
     </div>
-    <button @click="send(msg)">发送</button>
+    <!-- <button @click="send(msg)">发送</button> -->
     <!-- <button @click="sendNum">发送编码</button> -->
     <!-- <button @click="websocketsend">websocket发请求</button> -->
-    <button @click="getPosition">百度地图定位</button>
-    <button @click="showPosition">百度地图逆地址解析</button>
+    <!-- <button @click="getPosition">百度地图定位</button> -->
+    <!-- <button @click="showPosition">百度地图逆地址解析</button> -->
   </div>
 </template>
 
 <script>
 import httpConfig from "@/../public/httpConfig";
-import DialogBox from "@/components/DialogBox"
+import DialogBox from "@/components/DialogBox";
+import MyMap from "@/components/MyMap";
 export default {
   name: "window",
   data() {
@@ -55,42 +53,99 @@ export default {
     };
   },
 
-  components: {DialogBox},
+  components: { DialogBox, MyMap },
 
-  computed: {},
-
+  computed: {
+    canSend() {
+      let msg = this.msg.trim();
+      return msg !== "";
+    }
+  },
+  watch: {
+    msgList() {
+      this.$nextTick(() => {
+        let el = this.$refs.chatContent;
+        el.scrollTop = el.scrollHeight;
+      });
+    }
+  },
   mounted() {
     this.send("start");
   },
 
   methods: {
-    show(ev) {
-      if (ev.key == "Enter") {
-        this.send(this.msg);
+    // 指定区域鼠标滚动触发事件
+    scrollBarWheel(e) {
+      this.handleEventDelta(e, e.deltaY);
+    },
+    //处理滚动事件
+    handleEventDelta(e, delta) {
+      const isDeltaPositive = delta > 0;
+      const el = e.target.tagName === "TEXTAREA" ? e.target : this.$el;
+      const { scrollTop, scrollHeight, clientHeight } = el;
+      let shouldCancelScroll = false;
+      if (isDeltaPositive && delta > scrollHeight - clientHeight - scrollTop) {
+        // bottom limit
+        el.scrollTop = scrollHeight;
+        shouldCancelScroll = true;
+      } else if (!isDeltaPositive && -delta > scrollTop) {
+        // top limit
+        el.scrollTop = 0;
+        shouldCancelScroll = true;
+      }
+      if (shouldCancelScroll) {
+        this.cancelScrollEvent(e);
+      }
+    },
+    // 阻止滚动冒泡事件
+    cancelScrollEvent(e) {
+      e.stopImmediatePropagation();
+      return false;
+    },
+    show(e) {
+      this.msg = this.msg.trim();
+      if (e.key == "Enter") {
+        e.preventDefault();
+        if (this.msg !== "") {
+          this.send(this.msg);
+        } else {
+          alert("输入内容不能为空");
+        }
       } else {
         return;
       }
     },
+    // 发送
     send(val) {
       if (val !== "start" && !/[^{][}$]/.test(val)) {
-        this.msgList.push({ id: "2", msg: val });
+        this.msgList.push({ id: 2, msg: val });
+        this.msg = this.msg.trim();
+        if (this.msg === "") {
+          alert("输入内容不能为空");
+          return;
+        }
       }
       let url = httpConfig.url;
       let method = this.getConfig.method;
       let data = {};
       data[method] = val;
-      console.log(data);
       let _this = this;
       this.$axios
         .get(url + this.getConfig.interface, { params: data })
         .then(res => {
-          _this.msg = "";
           console.log(res);
+          _this.msg = "";
           let obj = res.data;
           if (obj.sentence.length !== 0) {
-            _this.msgList.push({ id: "1", msg: obj.sentence });
+            if (method === "get_position") {
+              _this.msgList.push({ id: 1, msg: obj.sentence,showMap:JSON.parse(val)});
+            } else {
+              _this.msgList.push({ id: 1, msg: obj.sentence });
+            }
+
+            console.log(data);
           } else {
-            _this.msgList.push({ id: "1", msg: "请稍后" });
+            _this.msgList.push({ id: 1, msg: "请稍后" });
           }
 
           if (obj.method) {
@@ -159,29 +214,13 @@ export default {
     },
     close() {
       this.$emit("close");
+      this.msgList=[];
+      // this.send("谢谢");
+      // this.send("start");
+    },
+    minimize(){
+      this.$emit("close");
     }
-    /*  nativePosition() {
-       if (navigator.geolocation) {
-        alert("你的浏览器支持Geolocation API");
-        debugger
-        navigator.geolocation.getCurrentPosition(
-          function(p) {
-            console.log(p);
-            debugger
-            var latitude = p.coords.latitude;
-            var longitude = p.coords.longitude;
-            alert("纬度"+latitude+"经度"+longitude);
-            // createMap(latitude,longitude);
-            // alert(1);
-          },
-          function(e) {
-            console.log(e);
-          }
-        );
-      } else {
-        alert("你的浏览器不支持Geolocation API");
-      }
-    } */
   }
 };
 </script>
@@ -229,10 +268,16 @@ export default {
 .window-content {
   height: 440px;
   width: 100%;
-  padding:36px 30px 0;
+  padding: 36px 30px 0;
   box-sizing: border-box;
   overflow-y: auto;
   border-bottom: 1px solid #e0e0e0;
+  .scrollbar;
+  .tip {
+    font-size: 18px;
+    color: #c4c4c4;
+    margin: 0;
+  }
 }
 .window-textarea {
   height: 220px;
@@ -249,15 +294,25 @@ export default {
       padding: 28px 30px 0;
       font-size: 20px;
       color: #000;
+      overflow-y: auto;
       .placeholder-class {
         font-size: 22px;
         font-weight: normal;
         color: #c4c4c4;
       }
-      &::-webkit-input-placeholder{.placeholder-class}
-      &::-moz-input-placeholder{.placeholder-class}
-      &:-moz-input-placeholder{.placeholder-class}
-      &::-ms-input-placeholder{.placeholder-class}
+      .scrollbar;
+      &::-webkit-input-placeholder {
+        .placeholder-class;
+      }
+      &::-moz-input-placeholder {
+        .placeholder-class;
+      }
+      &:-moz-input-placeholder {
+        .placeholder-class;
+      }
+      &::-ms-input-placeholder {
+        .placeholder-class;
+      }
     }
   }
   .enter {
@@ -284,11 +339,29 @@ export default {
   color: #fff;
   font-size: 22px;
   cursor: pointer;
-  .disabled-class{
+  .disabled-class {
     opacity: 0.6;
   }
-  &:active{.disabled-class}
-  &:hover{.disabled-class}
-  &:disabled{.disabled-class}
+  &:active {
+    .disabled-class;
+  }
+  &:hover {
+    .disabled-class;
+  }
+  &:disabled {
+    .disabled-class;
+  }
+}
+.scrollbar {
+  /*滚动条样式*/
+  &::-webkit-scrollbar {
+    /*滚动条整体样式*/
+    width: 10px; /*高宽分别对应横竖滚动条的尺寸*/
+    height: 95px;
+  }
+  &::-webkit-scrollbar-thumb {
+    border-radius: 5px;
+    background: #b9b9b9;
+  }
 }
 </style>

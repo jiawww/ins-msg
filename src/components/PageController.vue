@@ -63,28 +63,21 @@ export default {
   mounted() {
     let _this = this;
     let start = 0;
+    let eventType = "";
     if (Object.hasOwnProperty.call(window, "onmousewheel")) {
-      // 监听滚轮事件
-      window.addEventListener(
-        "mousewheel",
-        function(event) {
-          // IE/Opera/Chrome
-          let direction = event.wheelDelta > 0 ? "up" : "down";
-          _this.scrollHandler(direction);
-        },
-        false
-      );
+      eventType = "mousewheel";
     } else {
-      window.addEventListener(
-        "DOMMouseScroll",
-        function(event) {
-          // Firefox
-          let direction = event.detail > 0 ? "up" : "down";
-          _this.scrollHandler(direction);
-        },
-        false
-      );
+      eventType = "DOMMouseScroll";
     }
+    window.addEventListener(
+      eventType,
+      function(event) {
+        // debugger
+        let direction = event.wheelDelta > 0 ? "up" : "down";
+        _this.scrollHandler(direction);
+      },
+      false
+    );
     // 移动端触摸事件处理
     window.addEventListener("touchstart", function(event) {
       start = event.touches[0].clientY;
@@ -107,7 +100,7 @@ export default {
   methods: {
     changePage(index) {
       this.$emit("changePage", index);
-      if (this.currentPage === 0 && this.prevIndex!==0) {
+      if (this.currentPage === 0 && this.prevIndex !== 0) {
         this.$emit("switchHeader", "clear");
       }
     },

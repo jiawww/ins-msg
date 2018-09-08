@@ -2,10 +2,10 @@
 <template>
   <div class="robot-box" @mousedown="start" @touchstart="start" @mousemove="move" @touchmove="move"
        @mouseup="end" @touchend="end">
-    <div class="robot" v-show="isChat"  @click="switchWindow">
+    <div class="robot" v-show="!isChat"  @click="switchWindow">
       <img src="@public/image/chat_robot_1.gif" class="robot-stand">
     </div>
-    <div v-show="!isChat">
+    <div v-show="isChat">
       <img src="@public/image/chat_robot_2.gif" class="robot-chat">
       <window class="robot-window" @close="switchWindow"></window>  
     </div>
@@ -56,23 +56,6 @@ export default {
   mounted() {},
 
   methods: {
-    // 鼠标悬浮在机器人上
-   /*  over() {
-      let cartoonIndex = 0;
-      let _this = this;
-      this.timer = setInterval(function() {
-        cartoonIndex++;
-        if (cartoonIndex >= 18) {
-          cartoonIndex = 0;
-        }
-        _this.backgroundPosition = -cartoonIndex * 100 + "px";
-      }, 80);
-    }, */
-    // 清除定时器
-    /* clear() {
-      clearInterval(this.timer);
-      this.timer = null;
-    }, */
     //拖拽开始
     start() {
       this.flag = true;
