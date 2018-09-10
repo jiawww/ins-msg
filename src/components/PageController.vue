@@ -72,7 +72,6 @@ export default {
     window.addEventListener(
       eventType,
       function(event) {
-        // debugger
         let direction = event.wheelDelta > 0 ? "up" : "down";
         _this.scrollHandler(direction);
       },
@@ -100,7 +99,7 @@ export default {
   methods: {
     changePage(index) {
       this.$emit("changePage", index);
-      if (this.currentPage === 0 && this.prevIndex !== 0) {
+      if (this.currentPage === 0 && index !== 0 ) {
         this.$emit("switchHeader", "clear");
       }
     },

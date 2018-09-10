@@ -7,8 +7,8 @@
       <div class="msg-box">
         <img src="@public/image/chat_1.png" class="msg-triangle">
         <p class="msg-text" v-if="msg.showMap">
-          <span class="show-map">{{msg.msg}}</span>
-          <my-map :poins="msg.showMap"></my-map>
+          <span>{{msg.msg}}</span>
+          <my-map :point="msg.showMap"></my-map>
         </p>
         <p class="msg-text" v-else>{{msg.msg}}</p>
       </div>
@@ -92,9 +92,6 @@ export default {
       border-radius: 10px;
       margin: 10px 0;
       text-align:left;
-    }
-    .show-map{
-      padding-bottom:10px;
     }
   }
   .robot-msg {

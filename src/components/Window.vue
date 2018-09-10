@@ -69,10 +69,15 @@ export default {
       });
     }
   },
-  mounted() {
-    this.send("start");
+  mounted() {},
+  directives: {
+    focus: {
+      // 指令的定义
+      inserted: function(el) {
+        el.focus();
+      }
+    }
   },
-
   methods: {
     // 指定区域鼠标滚动触发事件
     scrollBarWheel(e) {
@@ -133,17 +138,22 @@ export default {
       this.$axios
         .get(url + this.getConfig.interface, { params: data })
         .then(res => {
-          console.log(res);
+          // console.log(res);
           _this.msg = "";
           let obj = res.data;
           if (obj.sentence.length !== 0) {
             if (method === "get_position") {
-              _this.msgList.push({ id: 1, msg: obj.sentence,showMap:JSON.parse(val)});
+              console.log(JSON.parse(val));
+              _this.msgList.push({
+                id: 1,
+                msg: obj.sentence,
+                showMap: JSON.parse(val)
+              });
             } else {
               _this.msgList.push({ id: 1, msg: obj.sentence });
             }
 
-            console.log(data);
+            // console.log(data);
           } else {
             _this.msgList.push({ id: 1, msg: "请稍后" });
           }
@@ -194,32 +204,19 @@ export default {
         { enableHighAccuracy: true }
       );
     },
-    showPosition() {
-      var geoc = new BMap.Geocoder();
-      geoc.getLocation(this.point, function(rs) {
-        var addComp = rs.addressComponents;
-        console.log(addComp);
-        alert(
-          addComp.province +
-            ", " +
-            addComp.city +
-            ", " +
-            addComp.district +
-            ", " +
-            addComp.street +
-            ", " +
-            addComp.streetNumber
-        );
-      });
+    initConversation() {
+      this.getConfig = {
+        interface: "conversation",
+        method: "sentence"
+      };
+      this.send("start");
     },
     close() {
       this.$emit("close");
-      this.msgList=[];
-      // this.send("谢谢");
-      // this.send("start");
+      this.msgList = [];
     },
-    minimize(){
-      this.$emit("close");
+    minimize() {
+      this.$emit("minimize");
     }
   }
 };
@@ -257,6 +254,7 @@ export default {
     margin-top: 18px;
     width: 30px;
     height: 30px;
+    cursor: pointer;
     &:nth-child(1) {
       margin-right: 26px;
     }

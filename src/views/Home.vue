@@ -35,7 +35,7 @@ export default {
       ],
       currentIndex: 0,
       currentPage: 1,
-      topHeight:0,
+      topHeight: 0,
       controllerOption: {
         arrowsType: true,
         navbar: true,
@@ -61,18 +61,18 @@ export default {
     this.$children.forEach((child, index) => {
       // 动态设置各个page内的options
       if (child.option === null) {
-        child.option = {index:index+1};
+        child.option = { index: index + 1 };
       }
     });
   },
   methods: {
-    switchHeader(direction){
-      if(direction==='up'){
-        this.topHeight='140px';
-      }else if(direction==='down'){
-        this.topHeight='0px';
-      }else if(direction==='clear'){
-         this.topHeight='0px';
+    switchHeader(direction) {
+      if (direction === "up") {
+        this.topHeight = "140px";
+      } else if (direction === "down") {
+        this.topHeight = "0px";
+      } else if (direction === "clear") {
+        this.topHeight = "0px";
       }
     },
     changePage(index) {
@@ -87,6 +87,7 @@ export default {
   width: 100%;
   position: relative;
   z-index: 10;
+  overflow: hidden;
 }
 .header {
   height: 140px;
@@ -118,6 +119,5 @@ export default {
   width: 100%;
   display: block;
 }
-
 </style>
 
