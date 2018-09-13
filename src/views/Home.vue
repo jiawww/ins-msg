@@ -11,8 +11,6 @@
        <img :src="banner" class="banner">
     </page>
     <page-controller :pageNum="pageNum" :currentPage="currentPage" @changePage="changePage" @switchHeader="switchHeader" :option="controllerOption"></page-controller>
-   <!--  <my-map></my-map> -->
-    <!-- <window></window> -->
     <chat-robot></chat-robot>
   </div>
 </template>
@@ -20,7 +18,6 @@
 <script>
 // @ is an alias to /src
 import ChatRobot from "@/components/ChatRobot.vue";
-import MyMap from "@/components/MyMap.vue";
 import Page from "@/components/Page.vue";
 import PageController from "@/components/PageController.vue";
 export default {
@@ -47,7 +44,6 @@ export default {
   components: {
     ChatRobot,
     Window,
-    MyMap,
     Page,
     PageController
   },

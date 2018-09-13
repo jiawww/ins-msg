@@ -10,6 +10,10 @@
           <span>{{msg.msg}}</span>
           <my-map :point="msg.showMap"></my-map>
         </p>
+        <div class="msg-text" v-if="msg.tableData">
+          <span>{{msg.msg}}</span>
+          <my-table :tableData="msg.tableData" class="set-table"></my-table>
+        </div>
         <p class="msg-text" v-else>{{msg.msg}}</p>
       </div>
     </div>
@@ -25,6 +29,7 @@
 
 <script>
 import MyMap from "@/components/MyMap"
+import MyTable from "@/components/MyTable"
 export default {
   name: "dialog-box",
   props: {
@@ -44,7 +49,7 @@ export default {
     return {};
   },
 
-  components: {MyMap},
+  components: {MyMap,MyTable},
 
   computed: {
     currentTime() {
@@ -78,7 +83,6 @@ export default {
   }
   .msg-box {
     position: relative;
-    // flex:1;
     max-width: 670px;
     .msg-triangle {
       width: 16px;
@@ -124,5 +128,8 @@ export default {
       }
     }
   }
+}
+.set-table{
+  margin-top:10px;
 }
 </style>

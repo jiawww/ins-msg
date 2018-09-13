@@ -9,12 +9,11 @@
       <div>
         <img src="@public/image/icon_close.png" class="icon-right" @click="close">
         <img src="@public/image/icon_small.png" class="icon-right" @click="minimize">
-      </div>    
+      </div>
     </div>
     <div class="window-content" @wheel="scrollBarWheel($event)" ref="chatContent">
       <p class="tip">可爱的小电，为您服务</p>
       <dialog-box v-for="(msg,index) in msgList" :key="index" :msg="msg"></dialog-box>
-      <!-- <my-map></my-map> -->
     </div>
     <div class="window-textarea">
       <div class="textarea-box">
@@ -36,7 +35,6 @@
 <script>
 import httpConfig from "@/../public/httpConfig";
 import DialogBox from "@/components/DialogBox";
-import MyMap from "@/components/MyMap";
 export default {
   name: "window",
   data() {
@@ -53,7 +51,7 @@ export default {
     };
   },
 
-  components: { DialogBox, MyMap },
+  components: { DialogBox},
 
   computed: {
     canSend() {
@@ -143,12 +141,25 @@ export default {
           let obj = res.data;
           if (obj.sentence.length !== 0) {
             if (method === "get_position") {
-              console.log(JSON.parse(val));
+              // console.log(JSON.parse(val));
               _this.msgList.push({
                 id: 1,
                 msg: obj.sentence,
                 showMap: JSON.parse(val)
               });
+            }
+            if (
+              obj.sentence.indexOf("[") !== -1 &&
+              obj.sentence.indexOf("]") === obj.sentence.length - 1
+            ) {
+              let str = obj.sentence,
+                idx,
+                tip,
+                jsonArr;
+              idx = str.indexOf("[");
+              tip = str.slice(0, idx);
+              jsonArr =JSON.parse(str.slice(idx,));              
+              _this.msgList.push({ id: 1, msg: tip,tableData: jsonArr});
             } else {
               _this.msgList.push({ id: 1, msg: obj.sentence });
             }
