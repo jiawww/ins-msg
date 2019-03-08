@@ -33,7 +33,7 @@ export default {
 
   methods: {
     initMap() {
-      console.log(this.point);
+      // console.log(this.point);
       let el = this.$refs.myMap;
       let _this = this;
       var map = new BMap.Map(el); //初始化地图

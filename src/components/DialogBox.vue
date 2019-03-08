@@ -10,7 +10,7 @@
           <span>{{msg.msg}}</span>
           <my-map :point="msg.showMap"></my-map>
         </p>
-        <div class="msg-text" v-if="msg.tableData">
+        <div class="msg-text" v-else-if="msg.tableData">
           <span>{{msg.msg}}</span>
           <my-table :tableData="msg.tableData" class="set-table"></my-table>
         </div>

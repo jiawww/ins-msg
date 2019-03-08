@@ -33,7 +33,8 @@
 </template>
 
 <script>
-import httpConfig from "@/../public/httpConfig";
+// import httpConfig from "@/../public/httpConfig";
+import httpConfig from "@public/httpConfig";
 import DialogBox from "@/components/DialogBox";
 export default {
   name: "window",
@@ -120,7 +121,9 @@ export default {
     },
     // 发送
     send(val) {
-      if (val !== "start" && !/[^{][}$]/.test(val)) {
+      console.log("val " + val);
+      if (val !== "start" && !/[^{][}$]/.test(val) && val != "query_electric" && val != "restart") {
+        console.log("val " + val);
         this.msgList.push({ id: 2, msg: val });
         this.msg = this.msg.trim();
         if (this.msg === "") {
@@ -128,26 +131,57 @@ export default {
           return;
         }
       }
+      if(val == "wait"){
+        this.getConfig = {
+          interface: "conversation",
+          method: "sentence"
+        };
+      }
       let url = httpConfig.url;
       let method = this.getConfig.method;
       let data = {};
+      if(val ==  "query_electric"){
+        val = "电费";
+      }
       data[method] = val;
+      
       let _this = this;
       this.$axios
         .get(url + this.getConfig.interface, { params: data })
-        .then(res => {
-          // console.log(res);
+        .then(
+          res => {
+          //console.log("res " + res);
           _this.msg = "";
           let obj = res.data;
-          if (obj.sentence.length !== 0) {
-            if (method === "get_position") {
-              // console.log(JSON.parse(val));
+          console.log(obj.sentence);
+          
+          if (obj.sentence.length !== 0 && !obj.padding) {
+            if (method === "get_position" && obj.method == "done") {
+               _this.getConfig = {
+                interface: obj.interface,
+                method: "sentence"
+              };
               _this.msgList.push({
                 id: 1,
                 msg: obj.sentence,
                 showMap: JSON.parse(val)
               });
+              _this.send("restart");
+              return;
             }
+           
+            if (obj.method){
+             console.log(obj.method);
+            }
+            if(obj.method == "finished"){
+              console.log(obj.method)
+              //关闭对话框
+              _this.close();
+              return;
+            }
+            if (obj.method){
+             console.log(obj.method);
+          }
             if (
               obj.sentence.indexOf("[") !== -1 &&
               obj.sentence.indexOf("]") === obj.sentence.length - 1
@@ -165,17 +199,35 @@ export default {
             }
 
             // console.log(data);
-          } else {
-            _this.msgList.push({ id: 1, msg: "请稍后" });
+          } 
+          else if(obj.padding){
+            console.log(obj.padding);
+            _this.getConfig = {
+              interface:obj.interface,
+              method:obj.method
+            };
+            _this.send(obj.sentence);
+            return;
           }
-
+          else {
+            if(obj.interface != "wait"){
+              _this.msgList.push({ id: 1, msg: "请稍后" });
+            }else
+            {
+              console.log(obj.interface)
+              return;
+            }
+          }
+          
           if (obj.method) {
+           
             if (obj.method == "done") {
               _this.getConfig = {
                 interface: obj.interface,
                 method: "sentence"
               };
-              _this.send("start");
+             
+              _this.send("restart");
               return;
             }
 
@@ -187,6 +239,7 @@ export default {
               obj.interface === "service_hall" &&
               obj.method === "get_position"
             ) {
+              console.log('get_position.....')
               _this.getPosition();
             }
           } else {
@@ -221,6 +274,7 @@ export default {
         method: "sentence"
       };
       this.send("start");
+      //let timer = setInterval(this.send, 10000, "wait");
     },
     close() {
       this.$emit("close");
